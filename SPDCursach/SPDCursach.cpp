@@ -174,8 +174,16 @@ int main()
 	PiAlphaStream ps(p, alpha);
 	ErrorsCounter es(&ps);
 	map<int,double> p_map=es.SimulateBroadcast(blockLength, S);
+	
 	cout << "Probabilities:" << endl;
 	for (auto const& m : p_map)
+	{
+		cout << m.first << ":" << m.second << endl;
+	}
+
+	map<int, double> rep_map = es.GetBroadcastProbs(blockLength, S, 20, 100000);
+	cout << "Repeats:" << endl;
+	for (auto const& m : rep_map)
 	{
 		cout << m.first << ":" << m.second << endl;
 	}

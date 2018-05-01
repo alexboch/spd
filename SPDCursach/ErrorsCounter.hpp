@@ -25,14 +25,51 @@ class ErrorsCounter
 {
 private:
 	ErrorStream* _errorStream;
+	std::random_device _rd;
+	std::uniform_real_distribution<> _dist;
 public:
 
+	/*
+	Возвращает словарь, где ключ--кол-во переспросов, знач-е--вероятность того, что при таком кол-ве принято верно
+	*/
+	std::map<int, double> GetBroadcastProbs(int blockLength, int numBlocks,int maxRepeats, int numBroadcasts = 10000)
+	{
+		std::map<int, double> repeats_map;
+		for (int j = 0; j < maxRepeats; j++)
+		{
+			
+			int success_count = 0;
+			for (int i = 0; i < numBroadcasts; i++)
+			{
+				int block_success_count = 0;
+				for (int k = 0; k < numBlocks+j; k++)//передача пакетов + переспросы
+				{
+					
+					double p_err = _errorStream->ProbThatGTE(1, blockLength);//если есть ошибки, считаем, что не передан
+					double rand_num = _dist(_rd);
+					if (rand_num > p_err)
+					{
+						block_success_count++;
+					}
+					if (block_success_count == numBlocks)
+					{
+						success_count++;//+1 успешная передача сообщения
+						break;//передали все блоки сообщения
+					}
+				}
+			}
+			double p = success_count / (double)numBroadcasts;
+			repeats_map[j] = p;
+		}
+		return repeats_map;
+	}
 
-
+	/*
+	Возвращает словарь, где ключ--кол-во ошибок, знач-е--вероятность того, что произойдет такое количество
+	*/
 	std::map<int,double> SimulateBroadcast(int blockLength,int numBlocks,int numBroadcasts=10000)
 	{
-		std::random_device rd;
-		std::uniform_real_distribution<> dist;
+		
 		std::vector<BroadcastResult> broadcastResults;
 		std::map<int, int> repeats_map;
 		//broadcastResults.reserve(numBroadcasts);
@@ -46,7 +83,7 @@ public:
 			{
 				//передать один блок
 				double p_err=_errorStream->ProbThatGTE(1, blockLength);//если есть ошибки, считаем, что не передан
-				double rand_num = dist(rd);
+				double rand_num = _dist(_rd);
 				if (rand_num <= p_err)
 				{
 					numRepeats++;
