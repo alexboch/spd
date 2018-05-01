@@ -40,7 +40,7 @@ public:
 			return 1;
 		}
 		double t = k;
-		return _p*pow(n / (t + 1), 1 - _alpha);
+		return _p*pow(n / t, 1 - _alpha);
 	}
 
 	double ProbThatEqual(int k,int n)
