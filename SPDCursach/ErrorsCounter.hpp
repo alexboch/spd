@@ -32,9 +32,10 @@ public:
 	/*
 	Возвращает словарь, где ключ--кол-во переспросов, знач-е--вероятность того, что при таком кол-ве принято верно
 	*/
-	std::map<int, double> GetBroadcastProbs(int blockLength, int numBlocks,int maxRepeats, int numBroadcasts = 10000)
+	std::vector<double> GetBroadcastProbs(int blockLength, int numBlocks,int maxRepeats, int numBroadcasts = 10000)
 	{
-		std::map<int, double> repeats_map;
+		std::vector<double> prob_vector;
+		prob_vector.reserve(maxRepeats);
 		for (int j = 0; j < maxRepeats; j++)
 		{
 			
@@ -59,9 +60,9 @@ public:
 				}
 			}
 			double p = success_count / (double)numBroadcasts;
-			repeats_map[j] = p;
+			prob_vector.push_back(p);
 		}
-		return repeats_map;
+		return prob_vector;
 	}
 
 	/*

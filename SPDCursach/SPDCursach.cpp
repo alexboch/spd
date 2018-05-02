@@ -181,11 +181,11 @@ int main()
 		cout << m.first << ":" << m.second << endl;
 	}
 
-	map<int, double> rep_map = es.GetBroadcastProbs(blockLength, S, 20, 100000);
+	vector<double> rep_probs = es.GetBroadcastProbs(blockLength, S, 20, 150000);
 	cout << "Repeats:" << endl;
-	for (auto const& m : rep_map)
+	for (int i = 0; i < rep_probs.size(); i++)
 	{
-		cout << m.first << ":" << m.second << endl;
+		cout << i << ":" << rep_probs[i] << endl;
 	}
 #pragma endregion
 	system("pause");
