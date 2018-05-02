@@ -30,7 +30,7 @@ private:
 public:
 
 	/*
-	Возвращает словарь, где ключ--кол-во переспросов, знач-е--вероятность того, что при таком кол-ве принято верно
+	Возвращает массив, где индекс--кол-во переспросов, знач-е--вероятность того, что при таком кол-ве принято верно
 	*/
 	std::vector<double> GetBroadcastProbs(int blockLength, int numBlocks,int maxRepeats, int numBroadcasts = 10000)
 	{
@@ -103,8 +103,7 @@ public:
 			{
 				repeats_map[numRepeats] = 1;
 			}
-			//BroadcastResult br(0, numRepeats);
-			//broadcastResults.push_back(br);
+			
 		}
 		std::map<int, double> probs_map;
 		//Перевести количество в вероятность
