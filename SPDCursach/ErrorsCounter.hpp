@@ -3,6 +3,7 @@
 #include "ErrorStream.hpp"
 #include <random>
 #include <map>
+#include <string>
 
 struct BroadcastResult
 {
@@ -27,8 +28,9 @@ private:
 	ErrorStream* _errorStream;
 	std::random_device _rd;
 	std::uniform_real_distribution<> _dist;
+	int num_outputs = 3;
 public:
-
+	
 	/*
 	¬озвращает массив, где индекс--кол-во переспросов, знач-е--веро€тность того, что при таком кол-ве прин€то верно
 	*/
@@ -68,9 +70,9 @@ public:
 	/*
 	¬озвращает словарь, где ключ--кол-во ошибок, знач-е--веро€тность того, что произойдет такое количество
 	*/
-	std::map<int,double> SimulateBroadcast(int blockLength,int numBlocks,int numBroadcasts=10000)
+	std::map<int,double> SimulateBroadcast(int blockLength,int numBlocks,int numBroadcasts=10000, bool output=true)
 	{
-		
+		setlocale(LC_ALL, "rus");
 		std::vector<BroadcastResult> broadcastResults;
 		std::map<int, int> repeats_map;
 		//broadcastResults.reserve(numBroadcasts);
@@ -79,12 +81,16 @@ public:
 			double time = 0;
 			int numRepeats = 0;
 			int blocksLeft = numBlocks;
-			
-			while (true)
+			bool canOutput = output&&i<num_outputs;
+			if(canOutput)
+				cout << "ѕередача сообщени€ номер " << i+1 << endl;
+			for(int blockIndex=1;;blockIndex++)
 			{
 				//передать один блок
 				double p_err=_errorStream->ProbThatGTE(1, blockLength);//если есть ошибки, считаем, что не передан
 				double rand_num = _dist(_rd);
+				
+				bool res = false;
 				if (rand_num <= p_err)
 				{
 					numRepeats++;
@@ -92,8 +98,18 @@ public:
 				else 
 				{
 					blocksLeft--;
+					res = true;
 				}
-				if (blocksLeft == 0) break;
+				if (canOutput)
+				{
+					string res_str = res ? " ќшибок: 0" : " ќшибок: >=1";
+					cout<< "ѕакет:" << blockIndex << res_str << endl;
+				}
+				if (blocksLeft == 0)
+				{
+					break;
+				}
+				
 			}
 			if (repeats_map.count(numRepeats))
 			{
@@ -103,7 +119,6 @@ public:
 			{
 				repeats_map[numRepeats] = 1;
 			}
-			
 		}
 		std::map<int, double> probs_map;
 		//ѕеревести количество в веро€тность
